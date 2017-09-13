@@ -34,6 +34,17 @@ int main(){
 	vecA *=2;
 	printMathObject(vecA, "A duplája");
 	
+	vec3 vecA3=vec3(8.0);
+	vec3 vecB3=vec3(3.0,6.0,7.0);
+	vec3 vecC3=vec3(vecA,6.0);
+	
+	printf("Equal %s\n",vecA3 == vecB3 ? "True " : "False ");
+	printMathObject(vecA3 + vecB3,"Osszeg ");
+	printMathObject(vecC3 * 10,"Szorzat ");
+	printMathObject(vecB3 - 2.0,"Kulombseg ");
+	printMathObject(vecB3 / 2.0,"Osztas ");
+	
+	
 	system("PAUSE");
 	return 0;
 }
