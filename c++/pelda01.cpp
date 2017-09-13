@@ -44,6 +44,15 @@ int main(){
 	printMathObject(vecB3 - 2.0,"Kulombseg ");
 	printMathObject(vecB3 / 2.0,"Osztas ");
 	
+	printf("####################\n");
+	
+	vec2 normVecC = normalize(vecC);
+	vec2 normVecB = normalize(vecB);
+	
+	float value = dot(normVecC, normVecB);
+	float rad = acos(value);
+	
+	printf("Radian between C and B %f\n",rad);
 	
 	system("PAUSE");
 	return 0;
