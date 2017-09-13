@@ -18,6 +18,10 @@ int main(){
 	printf("Equal %s\n",vecC == vecA ? "True" : "False");
 	printf("Not Equal %s\n",vecC != vecA ? "True" : "False");
 	
+	printMathObject(vecA + vecB,"Osszeg");
+	printMathObject(vecC - vecB,"Kulombseg");
+	printMathObject(vecB - vecC,"Kulombseg");
+	
 	system("PAUSE");
 	return 0;
 }
