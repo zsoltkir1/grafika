@@ -8,6 +8,16 @@ int main(){
 	
 	printf("coordinates: %f - %f\n",vecA[0],vecA[1]);
 	
+	vec2 vecB=vec2(8.0,2.0);
+	vec2 vecC=vec2(3.0,6.0);
+	vec2 vecD=vec2(3.0,6.0);
+
+	printMathObject(-vecA,"negated vector: ");
+	
+	printf("Equal %s\n",vecC == vecD ? "True" : "False");
+	printf("Equal %s\n",vecC == vecA ? "True" : "False");
+	printf("Not Equal %s\n",vecC != vecA ? "True" : "False");
+	
 	system("PAUSE");
 	return 0;
 }
