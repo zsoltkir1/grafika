@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Konstansok formázáshoz
+// Konstansok formazashoz
 ///////////////////////////////////////////////////////////////////////////////
 #define __BGM_FORMAT_B "%5s"
 #define __BGM_FORMAT_I "%9d"
@@ -598,7 +598,7 @@ inline vec4& operator/=(vec4& v, float f)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// 3x3 mátrix
+// 3x3 matrix
 ///////////////////////////////////////////////////////////////////////////////
 struct mat3
 {
@@ -622,13 +622,21 @@ struct mat3
 			}
 	{}
 
-	mat3(vec3 v1, vec3 v2, vec3 v3):
-		v{
-			{ v1[0], v1[1], v1[2] }, 
-			{ v2[0], v2[1], v2[2] }, 
-			{ v3[0], v3[1], v3[2] },
+	mat3(vec3 v1, vec3 v2, vec3 v3, bool columnMajor = false)
+	{
+		if (columnMajor)
+		{
+			v[0] = { v1[0], v2[0], v3[0] };
+			v[1] = { v1[1], v2[1], v3[1] };
+			v[2] = { v1[2], v2[2], v3[2] };
 		}
-	{}
+		else
+		{
+			v[0] = { v1[0], v1[1], v1[2] };
+			v[1] = { v2[0], v2[1], v2[2] };
+			v[2] = { v3[0], v3[1], v3[2] };
+		}
+	}
 
 	const vec3& operator[](size_t ind) const
 	{
@@ -836,13 +844,13 @@ inline mat3& operator/=(mat3& m, float f)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// 4x4 mátrix
+// 4x4 matrix
 ///////////////////////////////////////////////////////////////////////////////
 struct mat4
 {
 	vec4 v[4];
 
-	mat4(float d = 1.0f):
+    mat4(float d = 1.0f):
 		v{
 			{ d,    0.0f, 0.0f, 0.0f }, 
 			{ 0.0f, d,    0.0f, 0.0f },
@@ -863,14 +871,23 @@ struct mat4
 			}
 	{}
 
-	mat4(vec4 v1, vec4 v2, vec4 v3, vec4 v4):
-		v{
-			{ v1[0], v1[1], v1[2], v1[3] },
-			{ v2[0], v2[1], v2[2], v2[3] },
-			{ v3[0], v3[1], v3[2], v3[3] },
-			{ v4[0], v4[1], v4[2], v4[3] },
+	mat4(vec4 v1, vec4 v2, vec4 v3, vec4 v4, bool columnMajor = false)
+	{
+		if (columnMajor)
+		{
+			v[0] = { v1[0], v2[0], v3[0], v4[0] };
+			v[1] = { v1[1], v2[1], v3[1], v4[1] };
+			v[2] = { v1[2], v2[2], v3[2], v4[2] };
+			v[3] = { v1[3], v2[3], v3[3], v4[3] };
 		}
-	{}
+		else
+		{
+			v[0] = { v1[0], v1[1], v1[2], v1[3] };
+			v[1] = { v2[0], v2[1], v2[2], v2[3] };
+			v[2] = { v3[0], v3[1], v3[2], v3[3] };
+			v[3] = { v4[0], v4[1], v4[2], v4[3] };
+		}
+	}
 
 	mat4(mat3 m):
 		v{
@@ -1099,6 +1116,234 @@ inline mat4& operator/=(mat4& m, float f)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// 2x4 matrix
+///////////////////////////////////////////////////////////////////////////////
+
+struct mat24
+{
+    vec4 v[2];
+    
+    mat24(float d = 1.0f):
+        v{
+            { d,    0.0f, 0.0f, 0.0f },
+            { 0.0f, d,    0.0f, 0.0f },
+        }
+    {}
+    
+    mat24(float v11, float v12, float v13, float v14,
+         float v21, float v22, float v23, float v24):
+        v{
+            { v11, v12, v13, v14},
+            { v21, v22, v23, v24},
+        }
+    {}
+    
+    mat24(vec4 v1, vec4 v2):
+        v{
+            { v1[0], v1[1], v1[2], v1[3] },
+            { v2[0], v2[1], v2[2], v2[3] },
+        }
+    {}
+    
+    mat24(vec2 v1, vec2 v2, vec2 v3, vec2 v4):
+        v{
+            { v1[0], v2[0], v3[0], v4[0] },
+            { v1[1], v2[1], v3[1], v4[1] },
+        }
+    {}
+    
+    const vec4& operator[](size_t ind) const
+    {
+        assert(ind >= 0 && ind <= 2);
+        return v[ind];
+    }
+    
+    vec4& operator[](size_t ind)
+    {
+        assert(ind >= 0 && ind <= 2);
+        return v[ind];
+    }
+    
+    vec4 col(size_t ind) const
+    {
+        assert(ind >= 0 && ind <= 2);
+        return{ v[0][ind], v[1][ind] };
+    }
+    
+    vec4 row(size_t ind) const
+    {
+        assert(ind >= 0 && ind <= 2);
+        return v[ind];
+    }
+};
+
+inline bool operator==(mat24 m1, mat24 m2)
+{
+    return m1[0] == m2[0] && m1[1] == m2[1];
+}
+
+inline bool operator!=(mat24 m1, mat24 m2)
+{
+    return !(m1 == m2);
+}
+
+inline mat24 operator+(mat24 m1, mat24 m2)
+{
+    return mat24
+    {
+        m1[0] + m2[0],
+        m1[1] + m2[1]
+    };
+}
+
+inline mat24 operator-(mat24 m1, mat24 m2)
+{
+    return mat24
+    {
+        m1[0] - m2[0],
+        m1[1] - m2[1]
+    };
+}
+
+
+inline mat24 operator*(mat24 m1, mat4 m2)
+{
+    mat24 result;
+    
+    for (size_t i = 0; i < 2; ++i)
+    {
+        for (size_t j = 0; j < 4; ++j)
+        {
+            result[i][j] =
+                m1[i][0] * m2[0][j] +
+                m1[i][1] * m2[1][j] +
+                m1[i][2] * m2[2][j] +
+                m1[i][3] * m2[3][j];
+        }
+    }
+    
+    return result;
+}
+
+inline vec2 operator*(mat24 m, vec4 v)
+{
+    return vec2
+    {
+        m[0][0] * v[0] + m[0][1] * v[1] + m[0][2] * v[2] + m[0][3] * v[3],
+        m[1][0] * v[0] + m[1][1] * v[1] + m[1][2] * v[2] + m[1][3] * v[3]
+    };
+}
+
+inline mat24& operator+=(mat24& m1, mat24 m2)
+{
+    m1 = m1 + m2;
+    return m1;
+}
+
+inline mat24& operator-=(mat24& m1, mat24 m2)
+{
+    m1 = m1 - m2;
+    return m1;
+}
+
+inline mat24 operator+(mat24 m, float f)
+{
+    return mat24
+    {
+        m[0] + f,
+        m[1] + f
+    };
+}
+
+inline mat24 operator-(mat24 m, float f)
+{
+    return mat24
+    {
+        m[0] - f,
+        m[1] - f
+    };
+}
+
+inline mat24 operator*(mat24 m, float f)
+{
+    return mat24
+    {
+        m[0] * f,
+        m[1] * f
+    };
+}
+
+inline mat24 operator/(mat24 m, float f)
+{
+    return mat24
+    {
+        m[0] / f,
+        m[1] / f
+    };
+}
+
+inline mat24 operator+(float f, mat24 m)
+{
+    return mat24
+    {
+        f + m[0],
+        f + m[1]
+    };
+}
+
+inline mat24 operator-(float f, mat24 m)
+{
+    return mat24
+    {
+        f - m[0],
+        f - m[1]
+    };
+}
+
+inline mat24 operator*(float f, mat24 m)
+{
+    return mat24
+    {
+        f * m[0],
+        f * m[1]
+    };
+}
+
+inline mat24 operator/(float f, mat24 m)
+{
+    return mat24
+    {
+        f / m[0],
+        f / m[1]
+    };
+}
+
+inline mat24& operator+=(mat24& m, float f)
+{
+    m = m + f;
+    return m;
+}
+
+inline mat24& operator-=(mat24& m, float f)
+{
+    m = m - f;
+    return m;
+}
+
+inline mat24& operator*=(mat24& m, float f)
+{
+    m = m * f;
+    return m;
+}
+
+inline mat24& operator/=(mat24& m, float f)
+{
+    m = m / f;
+    return m;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // PI
 ///////////////////////////////////////////////////////////////////////////////
 inline float pi()
@@ -1121,7 +1366,7 @@ inline float half_pi()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Fok-radián konverziók
+// Fok-radian konverziok
 ///////////////////////////////////////////////////////////////////////////////
 static float radToDeg(float val)
 {
@@ -1138,7 +1383,7 @@ static float degToRad(float val)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Skaláris szorzat
+// Skalaris szorzat
 ///////////////////////////////////////////////////////////////////////////////
 inline float dot(vec2 v1, vec2 v2)
 {
@@ -1174,25 +1419,25 @@ inline float length(vec4 v)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Négyzetes hossz
+// Negyzetes hossz
 ///////////////////////////////////////////////////////////////////////////////
-inline float sqrlength(vec2 v)
+inline float length2(vec2 v)
 {
 	return dot(v, v);
 }
 
-inline float sqrlength(vec3 v)
+inline float length2(vec3 v)
 {
 	return dot(v, v);
 }
 
-inline float sqrlength(vec4 v)
+inline float length2(vec4 v)
 {
 	return dot(v, v);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Távolság
+// Tavolsag
 ///////////////////////////////////////////////////////////////////////////////
 inline float dist(vec2 v1, vec2 v2)
 {
@@ -1210,7 +1455,25 @@ inline float dist(vec4 v1, vec4 v2)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Vektoriális szorzat
+// Negyzetes tavolsag
+///////////////////////////////////////////////////////////////////////////////
+inline float dist2(vec2 v1, vec2 v2)
+{
+	return length2(v1 - v2);
+}
+
+inline float dist2(vec3 v1, vec3 v2)
+{
+	return length2(v1 - v2);
+}
+
+inline float dist2(vec4 v1, vec4 v2)
+{
+	return length2(v1 - v2);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Vektorialis szorzat
 ///////////////////////////////////////////////////////////////////////////////
 inline vec3 cross(vec3 v1, vec3 v2)
 {
@@ -1223,7 +1486,7 @@ inline vec3 cross(vec3 v1, vec3 v2)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Normalizált
+// Normalizalt
 ///////////////////////////////////////////////////////////////////////////////
 inline vec2 normalize(vec2 v)
 {
@@ -1241,7 +1504,33 @@ inline vec4 normalize(vec4 v)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Mátrix transzponált
+// Bezart szog (radianban, egysegvektorokkal)
+///////////////////////////////////////////////////////////////////////////////
+inline float angleBetweenFast(vec2 v1, vec2 v2)
+{
+	return acosf(dot(v1, v2));
+}
+
+inline float angleBetweenFast(vec3 v1, vec3 v2)
+{
+	return acosf(dot(v1, v2));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Bezart szog (radianban, tetszoleges vektorokkal)
+///////////////////////////////////////////////////////////////////////////////
+inline float angleBetween(vec2 v1, vec2 v2)
+{
+	return angleBetweenFast(normalize(v1), normalize(v2));
+}
+
+inline float angleBetween(vec3 v1, vec3 v2)
+{
+	return angleBetweenFast(normalize(v1), normalize(v2));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Matrix transzponalt
 ///////////////////////////////////////////////////////////////////////////////
 inline mat3 transpose(mat3 m)
 {
@@ -1265,7 +1554,7 @@ inline mat4 transpose(mat4 m)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Mátrix determináns
+// Matrix determinans
 ///////////////////////////////////////////////////////////////////////////////
 inline float determinant(mat3 m)
 {
@@ -1293,7 +1582,7 @@ inline float determinant(mat4 m)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Mátrix inverz
+// Matrix inverz
 ///////////////////////////////////////////////////////////////////////////////
 inline mat3 inverse(mat3 m)
 {
@@ -1362,7 +1651,7 @@ inline mat4 inverse(mat4 m)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Transzformációk - eltolás
+// Transzformaciok - eltolas
 ///////////////////////////////////////////////////////////////////////////////
 inline mat3 translate(vec2 v)
 {
@@ -1386,7 +1675,7 @@ inline mat4 translate(vec3 v)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Transzformációk - forgatás
+// Transzformaciok - forgatas
 ///////////////////////////////////////////////////////////////////////////////
 inline mat3 rotate(float angle)
 {
@@ -1437,7 +1726,7 @@ inline mat4 rotateZ(float angle)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Transzformációk - skálázás
+// Transzformaciok - skalazas
 ///////////////////////////////////////////////////////////////////////////////
 inline mat3 scale(vec2 v)
 {
@@ -1461,7 +1750,7 @@ inline mat4 scale(vec3 v)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Transzformációk - WtV
+// Transzformaciok - WtV
 ///////////////////////////////////////////////////////////////////////////////
 inline mat3 windowToViewport2(vec2 windowPos, vec2 windowSize, vec2 viewportPos, vec2 viewportSize)
 {
@@ -1480,7 +1769,7 @@ inline mat4 windowToViewport3(vec2 windowPos, vec2 windowSize, vec2 viewportPos,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Vetítések
+// Vetitesek
 ///////////////////////////////////////////////////////////////////////////////
 inline mat4 ortho()
 {
@@ -1543,7 +1832,7 @@ inline mat4 cavalier(float angle, float shortening)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Kiírató függvények
+// Kiirato fuggvenyek
 ///////////////////////////////////////////////////////////////////////////////
 inline void printMathObject(bool b, const char* prefix = "", FILE* fout = stdout)
 {
@@ -1614,6 +1903,16 @@ inline void printMathObject(mat4 m, const char* prefix = "", FILE* fout = stdout
 		m[1][0], m[1][1], m[1][2], m[1][3], 
 		m[2][0], m[2][1], m[2][2], m[2][3], 
 		m[3][0], m[3][1], m[3][2], m[3][3]);
+}
+
+inline void printMathObject(mat24 m, const char* prefix = "", FILE* fout = stdout)
+{
+    fprintf(fout, "%smat24\n(\n"
+            __BGM_FORMAT_F ", "  __BGM_FORMAT_F ", "  __BGM_FORMAT_F ", "  __BGM_FORMAT_F ", \n"
+            __BGM_FORMAT_F ", "  __BGM_FORMAT_F ", "  __BGM_FORMAT_F ", "  __BGM_FORMAT_F "\n)\n",
+            prefix,
+            m[0][0], m[0][1], m[0][2], m[0][3],
+            m[1][0], m[1][1], m[1][2], m[1][3]);
 }
 
 #endif // !H___BEVGRAFMATH2017
