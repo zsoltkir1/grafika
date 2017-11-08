@@ -70,9 +70,9 @@ void display() {
 	mat24 C = G*m;
 	
 	vec4 derivaltmatrix = {3*pow(t[2],2.0),2*t[2],1,0};
-	vec2 e2 = C*derivaltmatrix; //
-	points[4]=points[3]+(e2/3.0); // Ez mind a c1 folytonossag miatt ??!?
-	vec2 masodiknemmozgathato=points[3]+(e2);  //
+	vec2 e2 = C*derivaltmatrix;
+	points[4]=points[3]+(e2/3.0);
+	vec2 masodiknemmozgathato=points[3]+(e2);
 	GLint i;
 	float j;
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -146,15 +146,13 @@ void display() {
 	
 	//ez meg a görbe
 	glBegin(GL_LINE_STRIP);
-	for (float u2 = 0.0; u2 < 1.0; u2 += 0.01) {
+	for (float u = 0.0; u < 1.0; u += 0.01) {
 		for (int gen = 1; gen <= masodikBezierhossz; gen++) {
 			for (int i = 0; i <= (masodikBezierhossz - 1) - gen; i++) {
-				decastPoints[gen][i] = (1 - u2)*decastPoints[gen - 1][i] + u2*decastPoints[gen - 1][i + 1];
-				if (gen == 4) {
-					glVertex2f(decastPoints[gen][i].x, decastPoints[gen][i].y);
-				}
+				decastPoints[gen][i] = (1 - u)*decastPoints[gen - 1][i] + u*decastPoints[gen - 1][i + 1];
 			}
 		}
+		glVertex2f(decastPoints[4][0].x, decastPoints[4][0].y);
 	}
 	glEnd();
 	//gorbevege
