@@ -11,7 +11,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 #define __BGM_FORMAT_B "%5s"
 #define __BGM_FORMAT_I "%9d"
-#define __BGM_FORMAT_F "%9.4f"
+#define __BGM_FORMAT_F "%9.14f"
 
 ///////////////////////////////////////////////////////////////////////////////
 // 2D vektor
@@ -1781,17 +1781,17 @@ inline mat4 scale(vec3 v)
 inline mat3 windowToViewport2(vec2 windowPos, vec2 windowSize, vec2 viewportPos, vec2 viewportSize)
 {
 	return 
-		translate(viewportPos) * 
-		scale(vec2(viewportSize.x / windowSize.x, viewportSize.y / windowSize.y)) * 
-		translate(-windowPos);
+        translate(viewportPos) *
+        scale(vec2(viewportSize.x / windowSize.x, viewportSize.y / windowSize.y)) *
+        translate(-windowPos);
 }
 
 inline mat4 windowToViewport3(vec2 windowPos, vec2 windowSize, vec2 viewportPos, vec2 viewportSize)
 {
-	return 
-		translate(viewportPos) * 
-		scale(vec2(viewportSize.x / windowSize.x, viewportSize.y / windowSize.y)) * 
-		translate(-windowPos);
+	return
+        translate(vec3(viewportPos.x, viewportPos.y, 0)) *
+        scale(vec3(viewportSize.x / windowSize.x, viewportSize.y / windowSize.y, 1)) *
+        translate(vec3(-windowPos.x, -windowPos.y, 0));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
