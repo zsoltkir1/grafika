@@ -1,12 +1,36 @@
 #include <GL/glut.h>
-#include <bevgrafmath2017.h>
+#include "bevgrafmath2017.h"
 #include <math.h>
 
 GLsizei winWidth = 800, winHeight = 800;
 
+struct faces4 {
+	int p[4];
+	vec3 normal;
+};
+
 int N = 8;
 vec3 cube[8] = { };
 vec2 drawableCube[8] = {};
+
+int cubefaces[6][4] = {
+	{ 0,1,2,3 },
+	{ 1,5,6,2 },
+	{ 5,4,7,6 },
+	{ 4,0,3,7 },
+	{ 7,6,2,3 },
+	{ 4,1,5,0 }
+};
+vec3 cube12[8] = {
+	{ -1,-1,1 },//0
+	{ 1,-1,1 }, //1
+	{ 1,1,1 },	//2
+	{ -1,1,1 }, //3
+	{ -1,-1,-1 },//4
+	{ 1,-1,-1 }, //5
+	{ 1,1,-1 },  //6
+	{ -1,1,-1 }, //7
+};
 
 mat4 w2v, projection;
 float alpha = 0;
@@ -15,12 +39,12 @@ float beta = 0;
 
 void initMatrices(){
 
-	projection = ;
+	projection = ortho();
     
-    vec2 windowSize = { , };
-    vec2 windowPosition = { ,  };
-    vec2 viewportSize = { , };
-    vec2 viewportPosition = { , };
+    vec2 windowSize = {10, 10};
+    vec2 windowPosition = { -5, -5 };
+    vec2 viewportSize = { 450, 450};
+    vec2 viewportPosition = { winWidth / 2 - viewportSize.x / 2, winHeight / 2 - viewportSize.y / 2 };
     w2v = windowToViewport3(windowPosition, windowSize, viewportPosition, viewportSize);
 }
 
@@ -38,7 +62,7 @@ void init() {
 
 void drawCube(){
     
-    glBegin(GL_POINTS);
+    /*glBegin(GL_POINTS);
     for (int i = 0; i < N; i++){
 		
     }
@@ -46,11 +70,51 @@ void drawCube(){
 
 	glBegin(GL_LINES);
 
+	glEnd();*/
+    
+    
+    
+    glColor3f(1.0, 0.0, 0.0);
+	glBegin(GL_POLYGON);
+	for (int i = 0; i < 6; i++) {
+		for (int j = 0; j < 4; j++) {
+			glVertex2f(drawableCube[cubefaces[i][j]].x, drawableCube[cubefaces[i][j]].y);
+		}
+	}
 	glEnd();
+	glColor3f(1.000, 0.271, 0.000);
+	glBegin(GL_POINTS);
+	for (int i = 1; i < 2; i++) {
+		for (int j = 0; j < 3; j++) {
+			glVertex2f(drawableCube[cubefaces[i][j]].x, drawableCube[cubefaces[i][j]].y);
+		}
+	}
+	glEnd();
+
+	glBegin(GL_LINE_LOOP);
+	for (int i = 0; i < N / 2; i++) {
+		glVertex2f(drawableCube[i].x, drawableCube[i].y);
+	}
+	glEnd();
+
+	glBegin(GL_LINE_LOOP);
+	for (int i = (N / 2); i < N; i++) {
+		glVertex2f(drawableCube[i].x, drawableCube[i].y);
+	}
+	glEnd();
+
+	glBegin(GL_LINES);
+	for (int i = 0; i < (N / 2); i++) {
+		glVertex2f(drawableCube[i].x, drawableCube[i].y);
+		glVertex2f(drawableCube[i + 4].x, drawableCube[i + 4].y);
+	}
+	glEnd();
+
+    
     
 }
 
-void transform(){
+/*void transform(){
 	mat4 rotation = ;
     mat4 M = w2v * projection * rotation;
 
@@ -67,7 +131,7 @@ void transform(){
     }
     
 }
-
+*/
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
     
