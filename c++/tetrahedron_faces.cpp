@@ -1,5 +1,5 @@
 #include <GL/glut.h>
-#include <bevgrafmath2017.h>
+#include "bevgrafmath2017.h"
 #include <math.h>
 
 GLsizei winWidth = 800, winHeight = 600;
