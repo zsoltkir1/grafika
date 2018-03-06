@@ -2,11 +2,14 @@
 #include "bevgrafmath2017.h"
 #include <math.h>
 #include <iostream>
+#include <time.h>
 
 GLsizei winWidth = 800, winHeight = 600;
 
 vec2 points[6] = { {100, 100}, {500, 100}, {500, 500}, {100, 500},{250,250},{300,300} };
-vec2 asd = {0,0};
+vec2 irany;
+vec2 O;
+float r=20;
 
 GLint dragged = -1;
 
@@ -18,10 +21,24 @@ void init() {
 	gluOrtho2D(0.0, winWidth, 0.0, winHeight);
 	glShadeModel(GL_FLAT);
 	glEnable(GL_POINT_SMOOTH);
-	glEnable(GL_LINE_STIPPLE);
-	glPointSize(8.0);
-	glLineWidth(5.0);
-	glLineStipple(1, 0xFF00);
+	//glEnable(GL_LINE_STIPPLE);
+	glPointSize(6.0);
+    glLineWidth(3.0);
+	//glLineStipple(1, 0xFF00);
+    srand (time(NULL));
+    O={200,200};
+    irany={float(rand() % 9 - 4)-0.5f,float(rand() % 9 - 4)-0.5f};
+}
+
+void circle(vec2 O, float r) {
+	
+	glBegin(GL_LINE_STRIP);
+	for (float t = 0; t <=  2*pi(); t += 0.01){
+        vec2 korpont={O.x + r * cos(t),O.y + r * sin(t)};
+        korpont=korpont+irany;
+		glVertex2d(korpont.x,korpont.y);
+    }
+	glEnd();
 }
 
 vec2 normalVector(vec2 point1,vec2 point2){
@@ -103,6 +120,8 @@ void pontokKirajzolas(){
             if ((baloldala.x)*i+(baloldala.y)*j<(baloldala.x)*points[3].x+(baloldala.y)*points[3].y){
                 glColor3f(1.0,1.0,1.0);  
             }
+            float korben = (i-O.x)*(i-O.x)+(j-O.y)*(j-O.y)-r*r;
+            if (korben<0) glColor3f(0.0,0.3,0.3);
             glVertex2f(i, j);
         }
     }
@@ -126,6 +145,8 @@ void pontokKirajzolas(){
             if ((baloldala.x)*i+(baloldala.y)*j<(baloldala.x)*points[3].x+(baloldala.y)*points[3].y){
                 glColor3f(1.0,1.0,1.0);  
             }
+            float korben = (i-O.x)*(i-O.x)+(j-O.y)*(j-O.y)-r*r;
+            if (korben<0) glColor3f(0.0,0.3,0.3);
             glVertex2f(i, j);
         }
     }
@@ -139,17 +160,6 @@ void display() {
 	glClear(GL_COLOR_BUFFER_BIT);
 
     pontokKirajzolas();
-    /*for (i=points[3].x; i<points[2].x-20; i+=20){
-        for (j=points[0].y; j<points[3].y-20; j+=20){
-            if(j>300) {
-                glColor3f(0.0,1.0,1.0);
-            }
-            else{
-                glColor3f(1.0,1.0,1.0);
-            }
-            glVertex2f(i+10, j+10);
-        }        
-    }*/
 
 	glColor3f(0.0, 1.0, 0.0);
 
@@ -175,13 +185,17 @@ void display() {
 	glVertex2f(a.x, a.y);
     glVertex2f(b.x, b.y);
 	glEnd();
+    
+    glColor3f(0.0f, 0.4f, 0.2f);
+	
+	circle(O, r);
 
     //std::cout<<"reketyebokor"<<std::endl;
     
-    std::cout<<a.x<<std::endl;
+    /*std::cout<<a.x<<std::endl;
     std::cout<<a.y<<std::endl;
     std::cout<<b.x<<std::endl;
-    std::cout<<b.y<<std::endl;
+    std::cout<<b.y<<std::endl;*/
     
 	glutSwapBuffers();
 }
@@ -238,8 +252,31 @@ void processMouseActiveMotion(GLint xMouse, GLint yMouse) {
     }
 }
 
+void bounce(){
+    vec2 alsoegyenes=normalVector(points[0],points[1]);
+    float const1=alsoegyenes.x*points[0].x+alsoegyenes.y*points[0].y;
+    float dist01=fabs(alsoegyenes.x*(-O.x)+alsoegyenes.y*(-O.y)+const1)/sqrt(alsoegyenes.x*alsoegyenes.x+alsoegyenes.y*alsoegyenes.y);
+    if (dist01<=r) irany.y=irany.y*-1; 
+    vec2 felsoegyenes=normalVector(points[2],points[3]);
+    float const2=felsoegyenes.x*points[2].x+felsoegyenes.y*points[2].y;
+    float dist02=fabs(felsoegyenes.x*(-O.x)+felsoegyenes.y*(-O.y)+const2)/sqrt(felsoegyenes.x*felsoegyenes.x+felsoegyenes.y*felsoegyenes.y);
+    if (dist02<=r) irany.y=irany.y*-1;
+    vec2 jobbegyenes=normalVector(points[1],points[2]);
+    float const3=jobbegyenes.x*points[1].x+jobbegyenes.y*points[1].y;
+    float dist03=fabs(jobbegyenes.x*(-O.x)+jobbegyenes.y*(-O.y)+const3)/sqrt(jobbegyenes.x*jobbegyenes.x+jobbegyenes.y*jobbegyenes.y);
+    if (dist03<=r) irany.x=irany.x*-1;
+    vec2 balegyenes=normalVector(points[3],points[0]);
+    float const4=balegyenes.x*points[3].x+balegyenes.y*points[3].y;
+    float dist04=fabs(balegyenes.x*(-O.x)+balegyenes.y*(-O.y)+const4)/sqrt(balegyenes.x*balegyenes.x+balegyenes.y*balegyenes.y);
+    if (dist04<=r) irany.x=irany.x*-1;
+}
+
 void update(int n)
 {
+    O+=irany;
+    
+    bounce();
+    
 	glutPostRedisplay();
 
 	glutTimerFunc(10, update, 0);
