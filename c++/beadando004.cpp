@@ -10,14 +10,15 @@ GLint dragged = -1;
 
 GLint Round(GLfloat n) { return (GLint)(n + 0.5); }
 float t[4] = {-1.0,0.0,1.0,2.0};
-vec4 mvectors[4] = {{pow(t[0],3.0),pow(t[0],2.0),t[0],1.0},{pow(t[1],3.0),pow(t[1],2.0),t[1],1.0},{pow(t[2],3.0),pow(t[2],2.0),t[2],1.0},{pow(t[3],3.0),pow(t[3],2.0),t[3],1.0}};
+vec4 mvectors[4] = {{pow(t[0],3.0f),pow(t[0],2.0f),t[0],1.0f},{pow(t[1],3.0f),pow(t[1],2.0f),t[1],1.0f},{pow(t[2],3.0f),pow(t[2],2.0f),t[2],1.0f},{pow(t[3],3.0f),pow(t[3],2.0f),t[3],1.0f}};
 mat4 mi = {mvectors[0],mvectors[1],mvectors[2],mvectors[3]};
 mat4 m = transpose(inverse(mi));
 bool go = false;
 GLint keyStates[256];
-vec4 derivaltvec[4]={{3*pow(t[0],2.0),2*t[0],1.0,0.0},{3*pow(t[1],2.0),2*t[1],1.0,0.0},{3*pow(t[2],2.0),2*t[2],1.0,0.0},{3*pow(t[3],2.0),2*t[3],1.0,0.0}};
+vec4 derivaltvec[4]={{3*pow(t[0],2.0f),2*t[0],1.0f,0.0f},{3*pow(t[1],2.0f),2*t[1],1.0f,0.0f},{3*pow(t[2],2.0f),2*t[2],1.0f,0.0f},{3*pow(t[3],2.0f),2*t[3],1.0f,0.0f}};
 mat4 erintov ={derivaltvec[0],derivaltvec[1],derivaltvec[2],derivaltvec[3]};
 mat4 erinto = transpose(inverse(erintov));
+float gorbeut=-1.0;
 
 void init() {
 	glClearColor(1.0, 1.0, 1.0, 0.0);
@@ -33,23 +34,66 @@ void init() {
 
 void palcikaember() {
 	GLfloat j;
-	//mat24 G={points[0],points[2],points[3],points[1]-points[0]};
 	mat24 G={points[0],points[1],points[2],points[3]};
 	mat24 C = G*m;
-	//vec4 derivaltmatrix = {3*pow(t[2],2.0),2*t[2],1,0};
-	//vec2 e2 = C*derivaltmatrix;
 	glColor3f(0.0, 1.0, 1.0);
-	glBegin(GL_LINE_STRIP);
-		for (j = -1.0; j < 2.0; j=j+0.01){
-			vec4 derivaltmatrix = {3*pow(j,2.0),2*j,1,0};
-			//C=C*derivaltmatrix;
-			vec4 thirdvector = {{pow(j,3)},{pow(j,2)},{j},{1}};
-			vec2 qt = C*derivaltmatrix;
-			vec2 qt2 = C*thirdvector;
-			glVertex2f(-qt.y, qt.x);			
-		}
-		glEnd();
+	glBegin(GL_LINES);
+    vec4 derivaltmatrix = {3*pow(gorbeut,2.0f),2*gorbeut,1,0};
+    vec4 thirdvector = {{pow(gorbeut,3.0f)},{pow(gorbeut,2.0f)},{gorbeut},{1}};
+    vec2 iranyElsolab = C*derivaltmatrix;
+    vec2 qt2 = C*thirdvector;
+    iranyElsolab=normalize(iranyElsolab)*25;
+    vec2 elsolab={-iranyElsolab.y+qt2.x,iranyElsolab.x+qt2.y};
+    glVertex2f(elsolab.x, elsolab.y);
+    glVertex2f(qt2.x, qt2.y);
+   
+    /*thirdvector = {{pow((gorbeut+0.1f),3.0f)},{pow((gorbeut+0.1f),2.0f)},{(gorbeut+0.1f)},{1}};
+    vec2 masodiklab={-iranyElsolab.y+qt2.x, iranyElsolab.x+qt2.y};
+    glVertex2f(masodiklab.x, masodiklab.y);
+    qt2 = C*thirdvector;
+    glVertex2f(qt2.x, qt2.y); 
+    
+    //glVertex2f(qt2.x, qt2.y);  
+    glVertex2f(masodiklab.x, masodiklab.y); 
+    derivaltmatrix = {3*pow(gorbeut,2.0f),2*gorbeut,1.0f,0};
+    thirdvector = {{pow(gorbeut,3.0f)},{pow(gorbeut,2.0f)},{gorbeut},{1}};
+    vec2 qt = C*derivaltmatrix;
+    qt=normalize(qt)*40;
+    qt2 = C*thirdvector;
+    vec2 test={-qt.y+qt2.x, qt.x+qt2.y};
+    glVertex2f(test.x, test.y);*/
+    glEnd();
+    glBegin(GL_POINTS);
+    glVertex2f(elsolab.x, elsolab.y);
+    glEnd();
 }
+
+/*glBegin(GL_LINES);
+    vec4 derivaltmatrix = {3*pow(gorbeut,2.0f),2*gorbeut,1,0};
+    vec4 thirdvector = {{pow(gorbeut,3.0f)},{pow(gorbeut,2.0f)},{gorbeut},{1}};
+    vec2 iranyElsolab = C*derivaltmatrix;
+    vec2 qt = C*thirdvector;
+    iranyElsolab=normalize(iranyElsolab)*25;
+    vec2 elsolab={-iranyElsolab.y+qt.x,iranyElsolab.x+qt.y};
+    glVertex2f(elsolab.x, elsolab.y);
+    glVertex2f(iranyElsolab.x, iranyElsolab.y);
+   
+    thirdvector = {{pow((gorbeut+0.1f),3.0f)},{pow((gorbeut+0.1f),2.0f)},{(gorbeut+0.1f)},{1}};
+    vec2 masodiklab={-qt.y+iranyElsolab.x, qt.x+iranyElsolab.y};
+    glVertex2f(masodiklab.x, masodiklab.y);
+    vec2 iranyMasodiklab = C*thirdvector;
+    glVertex2f(iranyMasodiklab.x, iranyMasodiklab.y); 
+    
+    //glVertex2f(qt2.x, qt2.y);  
+    /*glVertex2f(masodiklab.x, masodiklab.y); 
+    derivaltmatrix = {3*pow(gorbeut,2.0f),2*gorbeut,1.0f,0};
+    thirdvector = {{pow(gorbeut,3.0f)},{pow(gorbeut,2.0f)},{gorbeut},{1}};
+    qt = C*derivaltmatrix;
+    qt=normalize(qt)*40;
+    qt2 = C*thirdvector;
+    vec2 test={-qt.y+qt2.x, qt.x+qt2.y};
+    glVertex2f(test.x, test.y);
+    glEnd();*/
 
 void display() {
 	GLint i;
@@ -68,7 +112,7 @@ void display() {
 		glColor3f(0.0, 1.0, 0.0);
 		glBegin(GL_LINE_STRIP);
 		for (j = -1.0; j < 2.0; j=j+0.01){
-			vec4 thirdvector = {{pow(j,3)},{pow(j,2)},{j},{1}};
+			vec4 thirdvector = {{pow(j,3.0f)},{pow(j,2.0f)},{j},{1}};
 			vec2 qt = C*thirdvector;
 			glVertex2f(qt.x, qt.y);
 		}
@@ -143,7 +187,7 @@ void keyUp(unsigned char key, int x, int y) {
 
 void keyOperations() {
     if (keyStates['n'] ) { 
-        if (go==false){
+        if ((!go) && (points.size()==4)){
             go=true;
         }       
 	}
@@ -151,6 +195,12 @@ void keyOperations() {
 
 void update(int n)
 {   
+    keyOperations();
+    
+    if (go){
+        gorbeut+=0.01;
+    }
+
 	glutPostRedisplay();
 
 	glutTimerFunc(10, update, 0);
@@ -167,6 +217,8 @@ int main(int argc, char** argv) {
 	glutDisplayFunc(display);
 	glutMouseFunc(processMouse);
 	glutMotionFunc(processMouseActiveMotion);
+    glutKeyboardFunc(keyPressed);
+	glutKeyboardUpFunc(keyUp);
     glutTimerFunc(5, update, 0);
 	glutMainLoop();
 	return 0;
