@@ -12,19 +12,13 @@ struct square {
 };
 
 float winWidth = 800, winHeight = 600;
-vec2 points[4] = { {100, 300}, {200, 100}, {300, 200}, {400, 100} };
-std::vector<square> squareCenters;
-std::vector<square> backSquareCenters;
-std::vector<vec2> starOuter;
+std::vector<square> squares;
+std::vector<square> backSquares;
 int vectorsize=0;
 int vectorprinter=0;
 float t = 0;
 vec2 s = {1, 1};
 int vecPosition = 0;
-double r;
-double g;
-double b;
-
 
 GLint dragged = -1;
 
@@ -48,19 +42,19 @@ void drawSquare() {
     vecPosition=vectorsize/90;
     for (int j=0;j<vecPosition;j++){
         for (int i=vectorprinter;i>j*90;i--){
-            glColor3f(squareCenters[i].r, squareCenters[i].g, squareCenters[i].b);
+            glColor3f(squares[i].r, squares[i].g, squares[i].b);
             glBegin(GL_POLYGON);
-                glVertex2f(squareCenters[i].p[0].x, squareCenters[i].p[0].y);
-                glVertex2f(squareCenters[i].p[1].x, squareCenters[i].p[1].y);
-                glVertex2f(squareCenters[i].p[2].x, squareCenters[i].p[2].y);
-                glVertex2f(squareCenters[i].p[3].x, squareCenters[i].p[3].y);			
+                glVertex2f(squares[i].p[0].x, squares[i].p[0].y);
+                glVertex2f(squares[i].p[1].x, squares[i].p[1].y);
+                glVertex2f(squares[i].p[2].x, squares[i].p[2].y);
+                glVertex2f(squares[i].p[3].x, squares[i].p[3].y);			
             glEnd();
             glColor3f(0.0, 0.0, 0.0);
             glBegin(GL_LINE_LOOP);
-                glVertex2f(squareCenters[i].p[0].x, squareCenters[i].p[0].y);
-                glVertex2f(squareCenters[i].p[1].x, squareCenters[i].p[1].y);
-                glVertex2f(squareCenters[i].p[2].x, squareCenters[i].p[2].y);
-                glVertex2f(squareCenters[i].p[3].x, squareCenters[i].p[3].y);		
+                glVertex2f(squares[i].p[0].x, squares[i].p[0].y);
+                glVertex2f(squares[i].p[1].x, squares[i].p[1].y);
+                glVertex2f(squares[i].p[2].x, squares[i].p[2].y);
+                glVertex2f(squares[i].p[3].x, squares[i].p[3].y);		
             glEnd();
         }
     }
@@ -70,7 +64,7 @@ void drawSquare() {
 void fillSquare(float x,float y) {
     t=t-360/90;
     vectorsize+=90;
-    backSquareCenters.clear();
+    backSquares.clear();
     square negyzet;
     negyzet.r=((double) rand() / (RAND_MAX));
     negyzet.g=((double) rand() / (RAND_MAX));
@@ -97,11 +91,11 @@ void fillSquare(float x,float y) {
                     negyzet.p[k] = { result.x, result.y  };
                 }
             }        
-        backSquareCenters.push_back(negyzet);
+        backSquares.push_back(negyzet);
         t=t+360/90;
     }
-    for (int i=0;i<backSquareCenters.size();i++){
-        squareCenters.push_back(backSquareCenters[i]);
+    for (int i=0;i<backSquares.size();i++){
+        squares.push_back(backSquares[i]);
     }
 }
 
