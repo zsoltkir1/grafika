@@ -93,6 +93,31 @@ vec2 metszespont(vec2 point1, vec2 point2, vec2 point3, vec2 point4){
     }
 }
 
+float x,y,z,theta,alfa=0.0;
+void spiral(){
+	Mk = w2v *projection* rotateX(90) * rotateY(90) *rotationZ * rotationX * rotationY;
+	glColor3f(1.0, 0.0, 0.0);
+	glBegin(GL_POINTS);
+	for (float i=0.0;i<5;i+=0.01){
+		for (float theta=0.0;theta<pi();theta+=0.01){
+			x=i*cos(alfa*theta);
+			y=i*cos(alfa*theta);
+			z=theta;
+			vec3 spiralpoint={x,y,z};
+			vec4 pointH = ihToH(spiralpoint);
+			vec4 transformedPoint = Mk*pointH;
+			if (transformedPoint.w != 0)
+			{
+				vec3 res = hToIh(transformedPoint);
+				//if (res.z == 0) {
+					glVertex2f(res.x,res.y);
+				//}
+			}
+		}
+	}
+	glEnd();
+}
+
 void drawCube() {
 	Mk = w2v *projection * rotationZ * rotationX * rotationY;
 	for (int i = 0; i < N; i++) {
@@ -160,6 +185,15 @@ void drawCube() {
 
 void leptetes()
 {
+	if (keyStates['n']) {
+		//cout << "a: " << beta <<endl;
+		alfa -= stepinterval;
+	}
+	if (keyStates['m']) {
+		//cout << "d: " << beta << endl;
+		alfa += stepinterval;
+	}
+	
     if (keyStates['q']) {
 		//cout << "a: " << beta <<endl;
 		beta -= stepinterval;
@@ -213,8 +247,10 @@ void display() {
 	glClear(GL_COLOR_BUFFER_BIT);
     
     initMatrices();
-    drawCube();
+	spiral();
+    //drawCube();
     leptetes();
+	
     
 	glutSwapBuffers();
 }
@@ -222,7 +258,6 @@ void display() {
 void update(int n)
 {    
 	glutPostRedisplay();
-
 	glutTimerFunc(10, update, 0);
 }
 
