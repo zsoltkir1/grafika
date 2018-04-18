@@ -64,8 +64,37 @@ void keyUp(unsigned char key, int x, int y) {
 	keyStates[key] = 0;
 }
 
+vec2 normalVector(vec2 point1,vec2 point2){
+    float subx=point2.x-point1.x;
+    float suby=point2.y-point1.y;
+    float x=suby*-1;
+    float y=subx;   
+    vec2 point3={x,y};
+    return point3;   
+}
+
+vec2 metszespont(vec2 point1, vec2 point2, vec2 point3, vec2 point4){
+    vec2 egyenes1=normalVector(point1,point2);
+    vec2 egyenes2=normalVector(point3,point4);
+    float const1=egyenes1.x*point1.x+egyenes1.y*point1.y;
+    float const2=egyenes2.x*point3.x+egyenes2.y*point3.y;
+    float detfelcserelt1=(const1*egyenes2.y)-(egyenes1.y*const2);
+    float detfelcserelt2=(egyenes1.x*const2)-(const1*egyenes2.x);
+    float deteredeti=(egyenes1.x*egyenes2.y)-(egyenes1.y*egyenes2.x);
+    if (deteredeti!=0){
+        vec2 a;
+        a.x=detfelcserelt1/deteredeti;
+        a.y=detfelcserelt2/deteredeti;
+        return a;
+    }
+    else {
+        vec2 a={-500,-500};
+        return a;
+    }
+}
+
 void drawCube() {
-	Mk = w2v *projection * rotationZ * rotationX;
+	Mk = w2v *projection * rotationZ * rotationX * rotationY;
 	for (int i = 0; i < N; i++) {
 		vec4 pointH = ihToH(cube12[i]);
 		vec4 transformedPoint = Mk*pointH;
@@ -77,23 +106,38 @@ void drawCube() {
 			}
 		}
 	}
-	glColor3f(0.0, 1.0, 0.0);
+	/*glColor3f(0.0, 1.0, 0.0);
 	glBegin(GL_POLYGON);
 	for (int i = 0; i < 6; i++) {
 		for (int j = 0; j < 4; j++) {
 			glVertex2f(drawableCube[cubefaces[i][j]].x, drawableCube[cubefaces[i][j]].y);
 		}
 	}
-	glEnd();
-	glColor3f(1.000, 0.271, 0.000);
-	glBegin(GL_POINTS);
-	for (int i = 1; i < 2; i++) {
-		for (int j = 0; j < 3; j++) {
+	glEnd();*/
+    
+    /*glColor3f(1.0, 0.0, 0.0);
+	glBegin(GL_LINE_LOOP);
+	for (int i = 0; i < 6; i++) {
+		for (int j = 0; j < 4; j++) {
 			glVertex2f(drawableCube[cubefaces[i][j]].x, drawableCube[cubefaces[i][j]].y);
 		}
 	}
-	glEnd();
+	glEnd();*/
 
+    glColor3f(1.0, 0.0, 0.0);
+	glBegin(GL_LINES);
+	for (int i = 0; i < 5; i++) {
+        for (int j=0; j < 3; j++){
+            if (drawableCube[cubefaces[i][j+1]].x<winWidth/2){
+                glVertex2f(drawableCube[cubefaces[i][j]].x, drawableCube[cubefaces[i][j]].y);
+                glVertex2f(drawableCube[cubefaces[i][j+1]].x, drawableCube[cubefaces[i][j+1]].y);
+            }
+        }
+	}
+	glEnd();
+    
+    
+    /*glColor3f(1.0, 0.0, 0.0);
 	glBegin(GL_LINE_LOOP);
 	for (int i = 0; i < N / 2; i++) {
 		glVertex2f(drawableCube[i].x, drawableCube[i].y);
@@ -111,7 +155,7 @@ void drawCube() {
 		glVertex2f(drawableCube[i].x, drawableCube[i].y);
 		glVertex2f(drawableCube[i + 4].x, drawableCube[i + 4].y);
 	}
-	glEnd();
+	glEnd();*/
 }
 
 void leptetes()
@@ -157,6 +201,13 @@ void leptetes()
 	glutPostRedisplay();
 }
 
+void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse) {
+	if (button == GLUT_LEFT_BUTTON && action == GLUT_DOWN){
+        cX=xMouse;
+        cY=winHeight-yMouse;
+    }  
+}
+
 void display() {
 	GLint i;
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -185,6 +236,7 @@ int main(int argc, char** argv) {
 	glutDisplayFunc(display);
 	//glutMouseFunc(processMouse);
 	//glutMotionFunc(processMouseActiveMotion);
+    glutMouseFunc(processMouse);
     glutTimerFunc(5, update, 0);
     glutKeyboardFunc(keyboard);
 	glutKeyboardUpFunc(keyUp);
