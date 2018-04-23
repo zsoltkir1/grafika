@@ -5,10 +5,11 @@
 #include <time.h>
 #include <vector>
 
-GLsizei winWidth = 800, winHeight = 600;
-mat4 w2v, projection, Mk, rotationZ, rotationX, rotationY;
+float winWidth = 800, winHeight = 600;
+mat4 w2v, projection, Mk, rotationZ, rotationX, rotationY, eltol;
 GLint keyStates[256];
 int N = 8,stateChange = 1;
+bool go=true,mouseButtonDown=false;
 int cubefaces[6][4] = {
 	{ 0,1,2,3 },
 	{ 1,5,6,2 },
@@ -28,8 +29,8 @@ vec3 cube12[8] = {
 	{ -1,1,-1 }, //7
 };
 vec2 drawableCube[8] = {};
-GLfloat cX = winWidth / 2, cY = winHeight / 2, cW = 45.0f, cH = 45.0f;
-float beta = 0.0, alpha = 0.0, gamma = 0.0, stepinterval = 0.05;
+GLfloat cX = winWidth / 2, cY = winHeight / 2, cW = 90.0f, cH = 90.0f;
+float beta = 0.0, alpha = 0.0, gamma = 0.0, stepinterval = 0.05, eltolx = 0, eltoly = 0, eltolz = 0, mx=0, my=0;
 
 void init() {
 	glClearColor(1.0, 1.0, 1.0, 0.0);
@@ -48,13 +49,18 @@ void initMatrices(){
     rotationX = rotateX(alpha);
     rotationY = rotateY(beta);
     rotationZ = rotateZ(gamma);
-	if (stateChange == 1) {
+    /*if (mouseButtonDown){
+        eltolx=(mx-winWidth/2)/90;
+        eltoly=((winHeight-my)-winHeight/2)/90;
+    }*/
+	/*if (stateChange == 1) {
 		projection = ortho();
 	}
 	else if (stateChange == 2) {
 		projection = perspective(5.0);
-	}
-	w2v = windowToViewport3(vec2(-1.0f, -1.0f), vec2(1.0f, 1.0f), vec2(cX, cY), vec2(cW, cH));
+	}*/
+    eltol = translate(vec3(eltolx,eltoly,eltolz));
+	w2v = windowToViewport3(vec2(-1.0f, -1.0f), vec2(1.0f, 1.0f), vec2(winWidth/2-50, winHeight/2-50), vec2(cW, cH));
 }
 
 void keyboard(unsigned char key, int x, int y) {
@@ -62,6 +68,18 @@ void keyboard(unsigned char key, int x, int y) {
 }
 void keyUp(unsigned char key, int x, int y) {
 	keyStates[key] = 0;
+}
+
+vec2 drawFelezovonal(){
+    vec2 egyeneskezdete={winWidth/2,0};
+    vec2 egyenesvege={winWidth/2,winHeight};
+    glColor3f(0.0, 0.0, 0.0);
+    glBegin(GL_LINES);
+        glVertex2f(egyeneskezdete.x, egyeneskezdete.y);
+        glVertex2f(egyenesvege.x, egyenesvege.y);
+	glEnd();
+    
+    
 }
 
 vec2 normalVector(vec2 point1,vec2 point2){
@@ -87,14 +105,11 @@ vec2 metszespont(vec2 point1, vec2 point2, vec2 point3, vec2 point4){
         a.y=detfelcserelt2/deteredeti;
         return a;
     }
-    else {
-        vec2 a={-500,-500};
-        return a;
-    }
 }
 
 void drawCube() {
-	Mk = w2v *projection * rotationZ * rotationX * rotationY;
+    projection=ortho();
+	Mk = w2v *projection * eltol * rotationZ * rotationX * rotationY;
 	for (int i = 0; i < N; i++) {
 		vec4 pointH = ihToH(cube12[i]);
 		vec4 transformedPoint = Mk*pointH;
@@ -106,56 +121,70 @@ void drawCube() {
 			//}
 		}
 	}
-	/*glColor3f(0.0, 1.0, 0.0);
-	glBegin(GL_POLYGON);
-	for (int i = 0; i < 6; i++) {
-		for (int j = 0; j < 4; j++) {
-			glVertex2f(drawableCube[cubefaces[i][j]].x, drawableCube[cubefaces[i][j]].y);
-		}
-	}
-	glEnd();*/
-    
-    /*glColor3f(1.0, 0.0, 0.0);
-	glBegin(GL_LINE_LOOP);
-	for (int i = 0; i < 6; i++) {
-		for (int j = 0; j < 4; j++) {
-			glVertex2f(drawableCube[cubefaces[i][j]].x, drawableCube[cubefaces[i][j]].y);
-		}
-	}
-	glEnd();*/
-
     glColor3f(1.0, 0.0, 0.0);
 	glBegin(GL_LINES);
 	for (int i = 0; i < 5; i++) {
         for (int j=0; j < 3; j++){
-            if (drawableCube[cubefaces[i][j+1]].x<winWidth/2){
+            if (drawableCube[cubefaces[i][j+1]].x>winWidth/2 && drawableCube[cubefaces[i][j]].x<winWidth/2){
+                glVertex2f(drawableCube[cubefaces[i][j]].x, drawableCube[cubefaces[i][j]].y);
+                vec2 egyeneskezdete={winWidth/2,0};
+                vec2 egyenesvege={winWidth/2,winHeight};
+                vec2 metszet=metszespont(drawableCube[cubefaces[i][j]],drawableCube[cubefaces[i][j+1]],egyeneskezdete,egyenesvege);
+                glVertex2f(metszet.x, metszet.y);
+            }
+             if (drawableCube[cubefaces[i][j+1]].x<winWidth/2 && drawableCube[cubefaces[i][j]].x>winWidth/2){
+                glVertex2f(drawableCube[cubefaces[i][j+1]].x, drawableCube[cubefaces[i][j+1]].y);
+                vec2 egyeneskezdete={winWidth/2,0};
+                vec2 egyenesvege={winWidth/2,winHeight};
+                vec2 metszet=metszespont(drawableCube[cubefaces[i][j]],drawableCube[cubefaces[i][j+1]],egyeneskezdete,egyenesvege);
+                glVertex2f(metszet.x, metszet.y);
+            }
+            if (drawableCube[cubefaces[i][j+1]].x<winWidth/2 && drawableCube[cubefaces[i][j]].x<winWidth/2){
+                glVertex2f(drawableCube[cubefaces[i][j]].x, drawableCube[cubefaces[i][j]].y);
+                glVertex2f(drawableCube[cubefaces[i][j+1]].x, drawableCube[cubefaces[i][j+1]].y);
+            }
+        }
+	}
+    glEnd();
+    
+    projection=perspective(5.0);
+    Mk = w2v *projection * eltol * rotationZ * rotationX * rotationY;
+	for (int i = 0; i < N; i++) {
+		vec4 pointH = ihToH(cube12[i]);
+		vec4 transformedPoint = Mk*pointH;
+		if (transformedPoint.w != 0)
+		{
+			vec3 res = hToIh(transformedPoint);
+			//if (res.z == 0) {
+				drawableCube[i] = { res.x, res.y };
+			//}
+		}
+	}	
+    glColor3f(0.0, 1.0, 0.0);
+    glBegin(GL_LINES);
+	for (int i = 0; i < 5; i++) {
+        for (int j=0; j < 3; j++){
+            if (drawableCube[cubefaces[i][j+1]].x<winWidth/2 && drawableCube[cubefaces[i][j]].x>winWidth/2){
+                glVertex2f(drawableCube[cubefaces[i][j]].x, drawableCube[cubefaces[i][j]].y);
+                vec2 egyeneskezdete={winWidth/2,0};
+                vec2 egyenesvege={winWidth/2,winHeight};
+                vec2 metszet=metszespont(drawableCube[cubefaces[i][j]],drawableCube[cubefaces[i][j+1]],egyeneskezdete,egyenesvege);
+                glVertex2f(metszet.x, metszet.y);
+            }
+             if (drawableCube[cubefaces[i][j+1]].x>winWidth/2 && drawableCube[cubefaces[i][j]].x<winWidth/2){
+                glVertex2f(drawableCube[cubefaces[i][j+1]].x, drawableCube[cubefaces[i][j+1]].y);
+                vec2 egyeneskezdete={winWidth/2,0};
+                vec2 egyenesvege={winWidth/2,winHeight};
+                vec2 metszet=metszespont(drawableCube[cubefaces[i][j]],drawableCube[cubefaces[i][j+1]],egyeneskezdete,egyenesvege);
+                glVertex2f(metszet.x, metszet.y);
+            }
+            if (drawableCube[cubefaces[i][j+1]].x>winWidth/2 && drawableCube[cubefaces[i][j]].x>winWidth/2){
                 glVertex2f(drawableCube[cubefaces[i][j]].x, drawableCube[cubefaces[i][j]].y);
                 glVertex2f(drawableCube[cubefaces[i][j+1]].x, drawableCube[cubefaces[i][j+1]].y);
             }
         }
 	}
 	glEnd();
-    
-    
-    /*glColor3f(1.0, 0.0, 0.0);
-	glBegin(GL_LINE_LOOP);
-	for (int i = 0; i < N / 2; i++) {
-		glVertex2f(drawableCube[i].x, drawableCube[i].y);
-	}
-	glEnd();
-
-	glBegin(GL_LINE_LOOP);
-	for (int i = (N / 2); i < N; i++) {
-		glVertex2f(drawableCube[i].x, drawableCube[i].y);
-	}
-	glEnd();
-
-	glBegin(GL_LINES);
-	for (int i = 0; i < (N / 2); i++) {
-		glVertex2f(drawableCube[i].x, drawableCube[i].y);
-		glVertex2f(drawableCube[i + 4].x, drawableCube[i + 4].y);
-	}
-	glEnd();*/
 }
 
 void leptetes()
@@ -205,7 +234,23 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse) {
 	if (button == GLUT_LEFT_BUTTON && action == GLUT_DOWN){
         cX=xMouse;
         cY=winHeight-yMouse;
-    }  
+        mouseButtonDown=true;
+    }
+}
+
+void processMouseActiveMotion(GLint xMouse, GLint yMouse) {
+    if (mouseButtonDown){
+        eltolx=(xMouse-winWidth/2)/90;
+        eltoly=((winHeight-yMouse)-winHeight/2)/90;
+    }
+	glutPostRedisplay();
+}
+
+void processMouse2(GLint xMouse, GLint yMouse) {
+	if (go){
+        mx=xMouse;
+        my=yMouse;
+    }    
 }
 
 void display() {
@@ -213,6 +258,7 @@ void display() {
 	glClear(GL_COLOR_BUFFER_BIT);
     
     initMatrices();
+    drawFelezovonal();
     drawCube();
     leptetes();
     
@@ -235,8 +281,10 @@ int main(int argc, char** argv) {
 	init();
 	glutDisplayFunc(display);
 	//glutMouseFunc(processMouse);
-	//glutMotionFunc(processMouseActiveMotion);
+	//glutMotionFunc(processMouseActiveMotion);  
     glutMouseFunc(processMouse);
+    glutMotionFunc(processMouseActiveMotion);
+    //glutPassiveMotionFunc(processMouse2);
     glutTimerFunc(5, update, 0);
     glutKeyboardFunc(keyboard);
 	glutKeyboardUpFunc(keyUp);
