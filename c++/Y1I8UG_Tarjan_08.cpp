@@ -219,9 +219,9 @@ void leptetes()
 }
 
 void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse) {
-	if (button == GLUT_LEFT_BUTTON && action == GLUT_DOWN){
-        mouseButtonDown=true;
-    }
+	/*if (button == GLUT_LEFT_BUTTON && action == GLUT_DOWN){
+        mouseButtonDown=true; bennemaradt és így lett beköldve :'(
+    }*/
     if (button == GLUT_LEFT_BUTTON && action == GLUT_UP){
         eddigennyitmentX=eltolx;
         eddigennyitmentY=eltoly;
@@ -233,11 +233,11 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse) {
 }
 
 void processMouseActiveMotion(GLint xMouse, GLint yMouse) {
-    if (mouseButtonDown){
+    //if (mouseButtonDown){ abszolut felesleges hülyeség csak bennemaradt és így lett beküldve:S
 
         eltolx=(xMouse-cX)/90+eddigennyitmentX;
         eltoly=(winHeight-yMouse-cY)/90+eddigennyitmentY;
-    }
+    //}
 	glutPostRedisplay();
 }
 

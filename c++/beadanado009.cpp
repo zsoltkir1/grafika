@@ -38,7 +38,7 @@ void init() {
 	glShadeModel(GL_FLAT);
 	glEnable(GL_POINT_SMOOTH);
 	//glEnable(GL_LINE_STIPPLE);
-	glPointSize(6.0);
+	glPointSize(1.0);
     glLineWidth(3.0);
 	//glLineStipple(1, 0xFF00);
     //initMatrices();
@@ -98,8 +98,8 @@ void spiral(){
 	Mk = w2v *projection* rotateX(90) * rotateY(90) *rotationZ * rotationX * rotationY;
 	glColor3f(1.0, 0.0, 0.0);
 	glBegin(GL_POINTS);
-	for (float i=0.0;i<5;i+=0.01){
-		for (float theta=0.0;theta<pi();theta+=0.01){
+	for (float i=0.0;i<5;i+=0.02){
+		for (float theta=0.0;theta<pi();theta+=0.02){
 			x=i*cos(alfa*theta);
 			y=i*cos(alfa*theta);
 			z=theta;
