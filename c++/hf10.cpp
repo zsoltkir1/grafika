@@ -415,7 +415,7 @@ void init() {
 	glLineWidth(1.0);
 	initTorus();
 	initLapok();
-	initMatrices();
+	//initMatrices();
 }
 
 int N = 5;
